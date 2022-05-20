@@ -139,10 +139,10 @@ void Game::run() {
     int itemCount = 0;
     int poisonCount = 0;
     while (true) {
-        usleep(MICROSECOND_SECOND * 0.5);
-
         snake.show(stage);
         drawGameBoard();
+
+        usleep(MICROSECOND_SECOND * 0.5);
 
         int key = getch();
         if (key == 'q') {
