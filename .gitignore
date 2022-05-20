@@ -1,0 +1,5 @@
+# ignore all .o file
+*.o
+
+# ignore Makefile
+Makefile
