@@ -25,8 +25,7 @@ Game::Game() {
     game = newwin(23, 46, 0, 0);
     score = newwin(11, 34, 0, 46);
     mission = newwin(13, 34, 10, 46);
-
-    itemCount = poisonCount = 0;
+    elapsed = itemCount = poisonCount = 0;
 }
 
 Game::~Game() {
@@ -92,29 +91,43 @@ void Game::drawGameBoard() {
             wattroff(game, COLOR_PAIR(stage[r][c]));
         }
     }
+
     wrefresh(game);
 }
 
 void Game::drawScoreBoard() {
     wattron(score, COLOR_PAIR(TEXT) | A_BOLD);
     mvwprintw(score, 1, 12, "SCORE BOARD");
-    wattron(score, COLOR_PAIR(TEXT) | A_BOLD);
+    wattroff(score, COLOR_PAIR(TEXT) | A_BOLD);
 
     wattron(score, COLOR_PAIR(TEXT));
-    mvwprintw(score, 3, 6, "B: %d", snake.max_size() / snake.size());
+    mvwprintw(score, 3, 6, "B: %d / %d", snake.size(), snake.max_size());
     mvwprintw(score, 4, 6, "+: %d", itemCount);
     mvwprintw(score, 5, 6, "-: %d", poisonCount);
     mvwprintw(score, 6, 6, "G: %d");
-    wattron(score, COLOR_PAIR(TEXT));
+    mvwprintw(score, 7, 6, "elapsed: %ds", elapsed / 2);
+    wattroff(score, COLOR_PAIR(TEXT));
+
+    wrefresh(score);
 }
 
-void Game::createItem() {
-    for (int r = 0; r < 21; r++) {
-        for (int c = 0; c < 21; c++) {
-            if (stage[r][c] == ITEM) {
-                stage[r][c] = EMPTY;
-            }
-        }
+void Game::drawMissionBoard() {
+    wattron(mission, COLOR_PAIR(TEXT) | A_BOLD);
+    mvwprintw(mission, 1, 14, "MISSION");
+    wattroff(mission, COLOR_PAIR(TEXT) | A_BOLD);
+
+    wattron(mission, COLOR_PAIR(TEXT));
+    mvwprintw(mission, 3, 6, "+(3): ( %s )", (itemCount >= 3 ? "v" : "x"));
+    mvwprintw(mission, 4, 6, "asd: ( %s )", "x");
+    wattroff(mission, COLOR_PAIR(TEXT));
+
+    wrefresh(mission);
+}
+
+void Game::create(TYPE type) {
+    Cell &item = items[type - ITEM];
+    if (item.type) {
+        stage[item.r][item.c] = EMPTY;
     }
 
     while (true) {
@@ -122,27 +135,10 @@ void Game::createItem() {
         int c = rand() % 20 + 1;
 
         if (stage[r][c] == EMPTY) {
-            stage[r][c] = ITEM;
-            return;
-        }
-    }
-}
-
-void Game::createPoison() {
-    for (int r = 0; r < 21; r++) {
-        for (int c = 0; c < 21; c++) {
-            if (stage[r][c] == POISON) {
-                stage[r][c] = EMPTY;
-            }
-        }
-    }
-
-    while (true) {
-        int r = rand() % 20 + 1;
-        int c = rand() % 20 + 1;
-
-        if (stage[r][c] == EMPTY) {
-            stage[r][c] = POISON;
+            stage[r][c] = type;
+            item.r = r;
+            item.c = c;
+            item.type = type;
             return;
         }
     }
@@ -152,16 +148,14 @@ void Game::run() {
     drawWindowBorder(game, 23, 46);
     drawWindowBorder(score, 11, 34);
     drawWindowBorder(mission, 13, 34);
+    snake.show(stage);
+    drawGameBoard();
     drawScoreBoard();
+    drawMissionBoard();
 
     int itemCount = 0;
     int poisonCount = 0;
     while (true) {
-        snake.show(stage);
-        drawGameBoard();
-
-        usleep(MICROSECOND_SECOND * 0.5);
-
         int key = getch();
         if (key == 'q') {
             break;
@@ -178,28 +172,30 @@ void Game::run() {
         }
 
         int move_result = snake.move(stage);
-        if (!move_result) {
+        if (!move_result || snake.size() < 3) {
             break;
-        } else if (move_result == ITEM) {
-            createItem();
+        }
+        if (move_result == ITEM || !(itemCount % 20)) {
+            create(ITEM);
             itemCount = 0;
-            this->itemCount++;
-        } else if (move_result == POISON) {
-            createPoison();
+            if (move_result == ITEM) this->itemCount++;
+        }
+        if (move_result == POISON || !(poisonCount % 25)) {
+            create(POISON);
             poisonCount = 0;
-            this->poisonCount++;
+            if (move_result == POISON) this->poisonCount++;
         }
 
-        if (snake.size() < 3) break;
-
-        if (itemCount % 10 == 0) createItem();
-        if (poisonCount % 15 == 0) createPoison();
-        drawScoreBoard();
-        wrefresh(score);
-        wrefresh(mission);
-        wrefresh(game);
         itemCount++;
         poisonCount++;
+        elapsed++;
+
+        snake.show(stage);
+        drawGameBoard();
+        drawScoreBoard();
+        drawMissionBoard();
+
+        usleep(MICROSECOND_SECOND * 0.5);
     }
 
     nodelay(stdscr, false);

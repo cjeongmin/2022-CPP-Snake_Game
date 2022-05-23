@@ -15,8 +15,10 @@
 class Game {
    private:
     int stage[21][21];
+    Cell items[2];
     int itemCount;
     int poisonCount;
+    int elapsed;
     Snake snake;
     WINDOW *game, *score, *mission;
 
@@ -27,8 +29,8 @@ class Game {
     void drawWindowBorder(WINDOW *window, int height, int width);
     void drawGameBoard();
     void drawScoreBoard();
-    void createItem();
-    void createPoison();
+    void drawMissionBoard();
+    void create(TYPE type);
     void run();
     void pause();  // for testing
 };

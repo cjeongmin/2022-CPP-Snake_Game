@@ -41,6 +41,7 @@ int Snake::move(int stage[21][21]) {
     cell.front().type = BODY;
     if (stage[y][x] == ITEM) {
         cell.push_front(Cell(y, x, HEAD));
+        if (cell.size() > maximum_length) maximum_length = cell.size();
         return ITEM;
     } else {
         cell.push_front(Cell(y, x, HEAD));
@@ -52,7 +53,6 @@ int Snake::move(int stage[21][21]) {
         }
     }
 
-    if (cell.size() > maximum_length) maximum_length = cell.size();
     return 1;
 }
 
