@@ -25,6 +25,8 @@ Game::Game() {
     game = newwin(23, 46, 0, 0);
     score = newwin(11, 34, 0, 46);
     mission = newwin(13, 34, 10, 46);
+
+    itemCount = poisonCount = 0;
 }
 
 Game::~Game() {
@@ -61,6 +63,8 @@ void Game::setColors() {
 
     init_color(GATE, 500, 500, 0);
     init_pair(GATE, GATE, GATE);
+
+    init_pair(TEXT, COLOR_BLACK, EMPTY);
 }
 
 void Game::drawWindowBorder(WINDOW *window, int height, int width) {
@@ -89,6 +93,19 @@ void Game::drawGameBoard() {
         }
     }
     wrefresh(game);
+}
+
+void Game::drawScoreBoard() {
+    wattron(score, COLOR_PAIR(TEXT) | A_BOLD);
+    mvwprintw(score, 1, 12, "SCORE BOARD");
+    wattron(score, COLOR_PAIR(TEXT) | A_BOLD);
+
+    wattron(score, COLOR_PAIR(TEXT));
+    mvwprintw(score, 3, 6, "B: %d", snake.max_size() / snake.size());
+    mvwprintw(score, 4, 6, "+: %d", itemCount);
+    mvwprintw(score, 5, 6, "-: %d", poisonCount);
+    mvwprintw(score, 6, 6, "G: %d");
+    wattron(score, COLOR_PAIR(TEXT));
 }
 
 void Game::createItem() {
@@ -135,6 +152,7 @@ void Game::run() {
     drawWindowBorder(game, 23, 46);
     drawWindowBorder(score, 11, 34);
     drawWindowBorder(mission, 13, 34);
+    drawScoreBoard();
 
     int itemCount = 0;
     int poisonCount = 0;
@@ -159,18 +177,24 @@ void Game::run() {
             // 다른 키 입력시 문제 여기로
         }
 
-        if (!snake.move(stage)) break;
-        if (snake.size() < 3) break;
-
-        if (itemCount % 10 == 0) {
+        int move_result = snake.move(stage);
+        if (!move_result) {
+            break;
+        } else if (move_result == ITEM) {
             createItem();
             itemCount = 0;
-        }
-        if (poisonCount % 15 == 0) {
+            this->itemCount++;
+        } else if (move_result == POISON) {
             createPoison();
             poisonCount = 0;
-        };
+            this->poisonCount++;
+        }
 
+        if (snake.size() < 3) break;
+
+        if (itemCount % 10 == 0) createItem();
+        if (poisonCount % 15 == 0) createPoison();
+        drawScoreBoard();
         wrefresh(score);
         wrefresh(mission);
         wrefresh(game);

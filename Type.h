@@ -11,6 +11,7 @@ enum TYPE {
     ITEM,
     POISON,
     GATE,
+    TEXT,
 };
 
 #endif

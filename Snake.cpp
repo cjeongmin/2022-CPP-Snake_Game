@@ -6,6 +6,7 @@ Snake::Snake() {
     dx[2] = dy[3] = 1;
     dx[1] = dx[3] = dy[0] = dy[2] = 0;
 
+    maximum_length = 3;
     cell.push_back(Cell(10, 10, HEAD));
     cell.push_back(Cell(10, 11, BODY));
     cell.push_back(Cell(10, 12, BODY));
@@ -25,26 +26,34 @@ int Snake::size() const {
     return cell.size();
 }
 
-bool Snake::move(int stage[21][21]) {
+int Snake::max_size() const {
+    return maximum_length;
+}
+
+int Snake::move(int stage[21][21]) {
     int x = cell.front().c + dx[direction];
     int y = cell.front().r + dy[direction];
 
     if (stage[y][x] == WALL || stage[y][x] == BODY || stage[y][x] == IMMUNE_WALL) {
-        return false;
+        return 0;
     }
 
     cell.front().type = BODY;
     if (stage[y][x] == ITEM) {
         cell.push_front(Cell(y, x, HEAD));
+        return ITEM;
     } else {
         cell.push_front(Cell(y, x, HEAD));
         cell.pop_back();
 
         if (stage[y][x] == POISON) {
             cell.pop_back();
+            return POISON;
         }
     }
-    return true;
+
+    if (cell.size() > maximum_length) maximum_length = cell.size();
+    return 1;
 }
 
 void Snake::show(int stage[21][21]) {
