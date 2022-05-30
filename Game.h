@@ -16,8 +16,10 @@ class Game {
    private:
     int stage[21][21];
     Cell items[2];
+    Cell gates[2];
     int itemCount;
     int poisonCount;
+    int gateCount;
     int elapsed;
     Snake snake;
     WINDOW *game, *score, *mission;
@@ -31,6 +33,7 @@ class Game {
     void drawScoreBoard();
     void drawMissionBoard();
     void create(TYPE type);
+    void generateGate();
     void run();
     void pause();  // for testing
 };

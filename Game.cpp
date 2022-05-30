@@ -13,6 +13,16 @@ Game::Game() {
             }
         }
     }
+    stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
+
+    for (int i = 5; i < 16; i++) {
+        for (int j = 5; j < 16; j++) {
+            if (i == 10 || j == 10) continue;
+            if (i == 5 || i == 15 || j == 5 || j == 15) {
+                stage[i][j] = WALL;
+            }
+        }
+    }
 
     initscr();
     resize_term(23, 80);
@@ -84,6 +94,8 @@ void Game::drawWindowBorder(WINDOW *window, int height, int width) {
 }
 
 void Game::drawGameBoard() {
+    snake.show(stage);
+
     for (int r = 0; r < 21; r++) {
         for (int c = 0; c < 21; c++) {
             wattron(game, COLOR_PAIR(stage[r][c]));
@@ -104,7 +116,7 @@ void Game::drawScoreBoard() {
     mvwprintw(score, 3, 6, "B: %d / %d", snake.size(), snake.max_size());
     mvwprintw(score, 4, 6, "+: %d", itemCount);
     mvwprintw(score, 5, 6, "-: %d", poisonCount);
-    mvwprintw(score, 6, 6, "G: %d");
+    mvwprintw(score, 6, 6, "G: %d", gateCount);
     mvwprintw(score, 7, 6, "elapsed: %ds", elapsed / 2);
     wattroff(score, COLOR_PAIR(TEXT));
 
@@ -144,14 +156,28 @@ void Game::create(TYPE type) {
     }
 }
 
+void Game::generateGate() {
+    for (int i = 0; i < 2; i++) {
+        while (true) {
+            int r = rand() % 20 + 1;
+            int c = rand() % 20 + 1;
+
+            if (stage[r][c] == WALL) {
+                stage[r][c] = GATE;
+                break;
+            }
+        }
+    }
+}
+
 void Game::run() {
     drawWindowBorder(game, 23, 46);
     drawWindowBorder(score, 11, 34);
     drawWindowBorder(mission, 13, 34);
-    snake.show(stage);
     drawGameBoard();
     drawScoreBoard();
     drawMissionBoard();
+    generateGate();
 
     int itemCount = 0;
     int poisonCount = 0;
@@ -174,23 +200,26 @@ void Game::run() {
         int move_result = snake.move(stage);
         if (!move_result || snake.size() < 3) {
             break;
-        }
-        if (move_result == ITEM || !(itemCount % 20)) {
-            create(ITEM);
-            itemCount = 0;
-            if (move_result == ITEM) this->itemCount++;
-        }
-        if (move_result == POISON || !(poisonCount % 25)) {
-            create(POISON);
-            poisonCount = 0;
-            if (move_result == POISON) this->poisonCount++;
+        } else {
+            if (move_result == ITEM || !(itemCount % 20)) {
+                create(ITEM);
+                itemCount = 0;
+                if (move_result == ITEM) this->itemCount++;
+            }
+            if (move_result == POISON || !(poisonCount % 25)) {
+                create(POISON);
+                poisonCount = 0;
+                if (move_result == POISON) this->poisonCount++;
+            }
+            if (move_result == GATE) {
+                this->gateCount++;
+            }
         }
 
         itemCount++;
         poisonCount++;
         elapsed++;
 
-        snake.show(stage);
         drawGameBoard();
         drawScoreBoard();
         drawMissionBoard();

@@ -23,6 +23,12 @@ class Snake {
     int size() const;
     int max_size() const;
     int move(int stage[21][21]);
+    bool inRange(int y, int x) const {
+        return !(y < 0 || y >= 21 || x < 0 || x >= 21);
+    }
+    bool isBlocked(int stage[21][21], int y, int x) const {
+        return stage[y][x] == WALL || stage[y][x] == IMMUNE_WALL;
+    };
     void show(int stage[21][21]);
 };
 
