@@ -213,8 +213,8 @@ void Game::run() {
             }
             if (move_result == GATE) {
                 this->gateCount++;
-                if (gateTimer + snake.size() >= 20) {
-                    gateTimer -= snake.size();
+                if (gateTimer + snake.size() >= 40) {
+                    gateTimer -= gateTimer + snake.size() - 39;
                 }
             }
         }
@@ -250,7 +250,7 @@ void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
                 setStage1();
                 break;
             case 2:
-                // setStage2();
+                setStage2();
                 break;
             case 3:
                 setStage3();
@@ -272,7 +272,10 @@ void Game::initStage() {
         }
     }
     stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
-
+    items[0] = Cell();
+    items[1] = Cell();
+    gates[0] = Cell();
+    gates[1] = Cell();
     snake.init();
 }
 
@@ -293,13 +296,11 @@ void Game::setStage0() {
 void Game::setStage1() {
     initStage();
     // stage 1
-    for (int i = 5; i < 16; i++) {
-        for (int j = 5; j < 16; j++) {
-            if (i == 5 || i == 15 || j == 5 || j == 15) {
-                stage[i][j] = WALL;
-            }
-        }
-    }
+    for (int i = 5; i < 16; i++)
+        stage[5][i] = WALL;
+    for (int j = 5; j < 16; j++)
+        stage[15][j] = WALL;
+
     generateGate();
 }
 
@@ -307,13 +308,13 @@ void Game::setStage2() {
     initStage();
 
     // stage 2
-    for (int i = 0; i < 21; i++) {
-        for (int j = 0; j < 21; j++) {
-            if (i == 10 || j == 10) {
-                stage[i][j] = WALL;
-            }
-        }
+    for (int i = 12; i < 20; i++) {
+        stage[i][i] = WALL;
     }
+    for (int i = 1; i < 9; i++) {
+        stage[i][i] = WALL;
+    }
+
     generateGate();
 }
 
