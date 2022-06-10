@@ -5,10 +5,6 @@
 
 Game::Game() {
     srand(time(NULL));
-    stageLevel = 0;
-
-    setStage0();
-
     initscr();
     resize_term(23, 80);
     curs_set(0);
@@ -17,10 +13,13 @@ Game::Game() {
     keypad(stdscr, true);
     cbreak();
     refresh();
+
     game = newwin(23, 46, 0, 0);
     score = newwin(11, 34, 0, 46);
     mission = newwin(13, 34, 10, 46);
-    elapsed = itemCount = poisonCount = 0;
+    elapsed = gateCount = itemCount = poisonCount = 0;
+    stageLevel = 0;
+    setStage0();
 }
 
 Game::~Game() {
@@ -98,10 +97,15 @@ void Game::drawScoreBoard() {
     wattroff(score, COLOR_PAIR(TEXT) | A_BOLD);
 
     wattron(score, COLOR_PAIR(TEXT));
+    mvwprintw(score, 3, 6, "                         ");
     mvwprintw(score, 3, 6, "B: %d / %d", snake.size(), snake.max_size());
+    mvwprintw(score, 4, 6, "                         ");
     mvwprintw(score, 4, 6, "+: %d", itemCount);
+    mvwprintw(score, 5, 6, "                         ");
     mvwprintw(score, 5, 6, "-: %d", poisonCount);
+    mvwprintw(score, 6, 6, "                         ");
     mvwprintw(score, 6, 6, "G: %d", gateCount);
+    mvwprintw(score, 7, 6, "                         ");
     mvwprintw(score, 7, 6, "elapsed: %ds", elapsed / 2);
     wattroff(score, COLOR_PAIR(TEXT));
 
@@ -114,8 +118,9 @@ void Game::drawMissionBoard() {
     wattroff(mission, COLOR_PAIR(TEXT) | A_BOLD);
 
     wattron(mission, COLOR_PAIR(TEXT));
-    mvwprintw(mission, 3, 6, "+(3): ( %s )", (itemCount >= 3 ? "v" : "x"));
-    mvwprintw(mission, 4, 6, "asd: ( %s )", "x");
+    mvwprintw(mission, 3, 9, "Success Condition");
+    mvwprintw(mission, 4, 5, "                        ", elapsed / 2);
+    mvwprintw(mission, 4, 5, "elapsed >= 60 : %d >= 60", elapsed / 2);
     wattroff(mission, COLOR_PAIR(TEXT));
 
     wrefresh(mission);
@@ -176,7 +181,7 @@ void Game::run() {
     int gateTimer = 0;
     while (true) {
         setStageLevel(itemTimer, poisonTimer, gateTimer);
-        
+
         int key = getch();
         if (key == 'q') {
             break;
@@ -234,34 +239,24 @@ void Game::run() {
     getch();
 }
 
-void Game::pause() {
-    getch();
-}
-
 void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
-    if (elapsed > 6) {
+    if (elapsed > 60 * 2) {
         stageLevel++;
-        elapsed = 0;
-        itemCount = 0;
-        poisonCount = 0;
-        gateCount = 0;
-        itemTimer = 0;
-        poisonTimer = 0;
-        gateTimer = 0;
-
+        elapsed = itemCount = poisonCount = gateCount = 0;
+        itemTimer = poisonTimer = gateTimer = 0;
 
         switch (stageLevel) {
-        case 1:
-            setStage1();
-            break;
-        case 2:
-            // setStage2();
-            break;
-        case 3:
-            setStage3();
-            break;
-        case 4:
-            setStage4();
+            case 1:
+                setStage1();
+                break;
+            case 2:
+                // setStage2();
+                break;
+            case 3:
+                setStage3();
+                break;
+            case 4:
+                setStage4();
         }
     }
 }
@@ -277,7 +272,7 @@ void Game::initStage() {
         }
     }
     stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
-    
+
     snake.init();
 }
 
@@ -297,7 +292,7 @@ void Game::setStage0() {
 
 void Game::setStage1() {
     initStage();
-    //stage 1
+    // stage 1
     for (int i = 5; i < 16; i++) {
         for (int j = 5; j < 16; j++) {
             if (i == 5 || i == 15 || j == 5 || j == 15) {
@@ -328,7 +323,7 @@ void Game::setStage3() {
     // stage 3
     for (int i = 0; i < 16; i++)
         stage[6][i] = WALL;
-    stage[6][0] = IMMUNE_WALL; 
+    stage[6][0] = IMMUNE_WALL;
     for (int i = 5; i < 21; i++)
         stage[14][i] = WALL;
     stage[14][20] = IMMUNE_WALL;

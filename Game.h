@@ -36,7 +36,6 @@ class Game {
     void create(TYPE type);
     void generateGate();
     void run();
-    void pause();  // for testing
     void setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer);
     void setStage0();
     void setStage1();
