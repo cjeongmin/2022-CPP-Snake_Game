@@ -47,7 +47,7 @@ int Snake::move(int stage[21][21]) {
         int r, c;
         for (int i = 0, flag = true; flag && i < 21; i++) {
             for (int j = 0; j < 21; j++) {
-                if (i != y && j != x && stage[i][j] == GATE) {
+                if ((i != y || j != x) && stage[i][j] == GATE) {
                     r = i;
                     c = j;
                     flag = false;

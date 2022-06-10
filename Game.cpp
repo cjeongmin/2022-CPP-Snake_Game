@@ -1,10 +1,10 @@
 #include "Game.h"
 
+#include <cmath>
 #include <iostream>
 
 Game::Game() {
     srand(time(NULL));
-
     stageLevel = 0;
 
     setStage0();
@@ -55,7 +55,7 @@ void Game::setColors() {
     init_color(POISON, 1000, 0, 0);
     init_pair(POISON, POISON, POISON);
 
-    init_color(GATE, 500, 500, 0);
+    init_color(GATE, 1000, 500, 750);
     init_pair(GATE, GATE, GATE);
 
     init_pair(TEXT, COLOR_BLACK, EMPTY);
@@ -143,11 +143,19 @@ void Game::create(TYPE type) {
 
 void Game::generateGate() {
     for (int i = 0; i < 2; i++) {
+        Cell &gate = gates[i];
+        if (gate.type) {
+            stage[gate.r][gate.c] = WALL;
+        }
+
         while (true) {
             int r = rand() % 20 + 1;
             int c = rand() % 20 + 1;
 
             if (stage[r][c] == WALL) {
+                gate.r = r;
+                gate.c = c;
+                gate.type = GATE;
                 stage[r][c] = GATE;
                 break;
             }
@@ -163,11 +171,11 @@ void Game::run() {
     drawScoreBoard();
     drawMissionBoard();
 
-    int itemCount = 0;
-    int poisonCount = 0;
-
+    int itemTimer = 0;
+    int poisonTimer = 0;
+    int gateTimer = 0;
     while (true) {
-        setStageLevel(itemCount, poisonCount);
+        setStageLevel(itemTimer, poisonTimer, gateTimer);
         
         int key = getch();
         if (key == 'q') {
@@ -188,24 +196,33 @@ void Game::run() {
         if (!move_result || snake.size() < 3) {
             break;
         } else {
-            if (move_result == ITEM || !(itemCount % 20)) {
+            if (move_result == ITEM || !(itemTimer % 20)) {
                 create(ITEM);
-                itemCount = 0;
+                itemTimer = 0;
                 if (move_result == ITEM) this->itemCount++;
             }
-            if (move_result == POISON || !(poisonCount % 25)) {
+            if (move_result == POISON || !(poisonTimer % 25)) {
                 create(POISON);
-                poisonCount = 0;
+                poisonTimer = 0;
                 if (move_result == POISON) this->poisonCount++;
             }
             if (move_result == GATE) {
                 this->gateCount++;
+                if (gateTimer + snake.size() >= 20) {
+                    gateTimer -= snake.size();
+                }
             }
         }
 
-        itemCount++;
-        poisonCount++;
+        if (gateTimer % 40 == 0) {
+            generateGate();
+            gateTimer = 0;
+        }
+
+        itemTimer++;
+        poisonTimer++;
         elapsed++;
+        gateTimer++;
 
         drawGameBoard();
         drawScoreBoard();
@@ -221,15 +238,17 @@ void Game::pause() {
     getch();
 }
 
-void Game::setStageLevel(int &itemTimerCount, int &poisonTimerCount) {
+void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
     if (elapsed > 6) {
         stageLevel++;
         elapsed = 0;
         itemCount = 0;
         poisonCount = 0;
         gateCount = 0;
-        itemTimerCount = 0;
-        poisonTimerCount = 0;
+        itemTimer = 0;
+        poisonTimer = 0;
+        gateTimer = 0;
+
 
         switch (stageLevel) {
         case 1:
