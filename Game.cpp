@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include <cmath>
 #include <iostream>
 
 Game::Game() {
@@ -15,7 +16,7 @@ Game::Game() {
     }
     stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
 
-    // stage 0
+    // // stage 0
     // for (int i = 5; i < 16; i++) {
     //     for (int j = 5; j < 16; j++) {
     //         if (i == 10 || j == 10) continue;
@@ -25,7 +26,7 @@ Game::Game() {
     //     }
     // }
 
-    // stage 1
+    // // stage 1
     // for (int i = 5; i < 16; i++) {
     //     for (int j = 5; j < 16; j++) {
     //         if (i == 5 || i == 15 || j == 5 || j == 15) {
@@ -34,7 +35,7 @@ Game::Game() {
     //     }
     // }
 
-    // stage 2
+    // // stage 2
     // for (int i = 0; i < 21; i++) {
     //     for (int j = 0; j < 21; j++) {
     //         if (i == 10 || j == 10) {
@@ -42,27 +43,26 @@ Game::Game() {
     //         }
     //     }
     // }
-    
-    // stage 3
+
+    // // stage 3
     // for (int i = 0; i < 16; i++)
     //     stage[6][i] = WALL;
-    // stage[6][0] = IMMUNE_WALL; 
+    // stage[6][0] = IMMUNE_WALL;
     // for (int i = 5; i < 21; i++)
     //     stage[14][i] = WALL;
     // stage[14][20] = IMMUNE_WALL;
 
-    // stage 4
-    for (int i = 1; i < 8; i++)
-        stage[4][i] = WALL;
-    stage[4][0] = IMMUNE_WALL;
-    for (int i = 13; i < 21; i++)
-        stage[16][i] = WALL;
-    stage[16][20] = IMMUNE_WALL;
-    for (int i = 4; i < 17; i++)
-        stage[i][7] = WALL;
-    for (int i = 4; i < 17; i++)
-        stage[i][13] = WALL;
-    
+    // // stage 4
+    // for (int i = 1; i < 8; i++)
+    //     stage[4][i] = WALL;
+    // stage[4][0] = IMMUNE_WALL;
+    // for (int i = 13; i < 21; i++)
+    //     stage[16][i] = WALL;
+    // stage[16][20] = IMMUNE_WALL;
+    // for (int i = 4; i < 17; i++)
+    //     stage[i][7] = WALL;
+    // for (int i = 4; i < 17; i++)
+    //     stage[i][13] = WALL;
 
     initscr();
     resize_term(23, 80);
@@ -110,7 +110,7 @@ void Game::setColors() {
     init_color(POISON, 1000, 0, 0);
     init_pair(POISON, POISON, POISON);
 
-    init_color(GATE, 500, 500, 0);
+    init_color(GATE, 1000, 500, 750);
     init_pair(GATE, GATE, GATE);
 
     init_pair(TEXT, COLOR_BLACK, EMPTY);
@@ -198,11 +198,19 @@ void Game::create(TYPE type) {
 
 void Game::generateGate() {
     for (int i = 0; i < 2; i++) {
+        Cell &gate = gates[i];
+        if (gate.type) {
+            stage[gate.r][gate.c] = WALL;
+        }
+
         while (true) {
             int r = rand() % 20 + 1;
             int c = rand() % 20 + 1;
 
             if (stage[r][c] == WALL) {
+                gate.r = r;
+                gate.c = c;
+                gate.type = GATE;
                 stage[r][c] = GATE;
                 break;
             }
@@ -221,6 +229,7 @@ void Game::run() {
 
     int itemCount = 0;
     int poisonCount = 0;
+    int gateTimer = 0;
     while (true) {
         int key = getch();
         if (key == 'q') {
@@ -253,12 +262,21 @@ void Game::run() {
             }
             if (move_result == GATE) {
                 this->gateCount++;
+                if (gateTimer + snake.size() >= 20) {
+                    gateTimer -= snake.size();
+                }
             }
+        }
+
+        if (gateTimer % 40 == 0) {
+            generateGate();
+            gateTimer = 0;
         }
 
         itemCount++;
         poisonCount++;
         elapsed++;
+        gateTimer++;
 
         drawGameBoard();
         drawScoreBoard();
