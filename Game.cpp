@@ -118,12 +118,12 @@ void Game::drawMissionBoard() {
     wattroff(mission, COLOR_PAIR(TEXT) | A_BOLD);
 
     wattron(mission, COLOR_PAIR(TEXT));
-    mvwprintw(mission, 3, 5, "elapsed >= 60");
+    mvwprintw(mission, 3, 5, "elapsed > 60");
     mvwprintw(mission, 4, 5, "                        ");
-    mvwprintw(mission, 4, 5, " -- %ds >= 60", elapsed / 2);
-    mvwprintw(mission, 5, 5, "Max length >= 10");
+    mvwprintw(mission, 4, 5, " -- %ds > 60", elapsed / 2);
+    mvwprintw(mission, 5, 5, "Max length > 10");
     mvwprintw(mission, 6, 5, "                        ");
-    mvwprintw(mission, 6, 5, " -- %d >= 10", snake.max_size());
+    mvwprintw(mission, 6, 5, " -- %d > 10", snake.max_size());
     wattroff(mission, COLOR_PAIR(TEXT));
 
     wrefresh(mission);
@@ -243,7 +243,7 @@ void Game::run() {
 }
 
 void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
-    if ( (elapsed > 60 * 2) && snake.size() > 10) {
+    if ((elapsed > 60 * 2) && snake.size() > 10) {
         stageLevel++;
         elapsed = itemCount = poisonCount = gateCount = 0;
         itemTimer = poisonTimer = gateTimer = 0;
