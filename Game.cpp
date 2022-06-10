@@ -15,14 +15,54 @@ Game::Game() {
     }
     stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
 
-    for (int i = 5; i < 16; i++) {
-        for (int j = 5; j < 16; j++) {
-            if (i == 10 || j == 10) continue;
-            if (i == 5 || i == 15 || j == 5 || j == 15) {
-                stage[i][j] = WALL;
-            }
-        }
-    }
+    // stage 0
+    // for (int i = 5; i < 16; i++) {
+    //     for (int j = 5; j < 16; j++) {
+    //         if (i == 10 || j == 10) continue;
+    //         if (i == 5 || i == 15 || j == 5 || j == 15) {
+    //             stage[i][j] = WALL;
+    //         }
+    //     }
+    // }
+
+    // stage 1
+    // for (int i = 5; i < 16; i++) {
+    //     for (int j = 5; j < 16; j++) {
+    //         if (i == 5 || i == 15 || j == 5 || j == 15) {
+    //             stage[i][j] = WALL;
+    //         }
+    //     }
+    // }
+
+    // stage 2
+    // for (int i = 0; i < 21; i++) {
+    //     for (int j = 0; j < 21; j++) {
+    //         if (i == 10 || j == 10) {
+    //             stage[i][j] = WALL;
+    //         }
+    //     }
+    // }
+    
+    // stage 3
+    // for (int i = 0; i < 16; i++)
+    //     stage[6][i] = WALL;
+    // stage[6][0] = IMMUNE_WALL; 
+    // for (int i = 5; i < 21; i++)
+    //     stage[14][i] = WALL;
+    // stage[14][20] = IMMUNE_WALL;
+
+    // stage 4
+    for (int i = 1; i < 8; i++)
+        stage[4][i] = WALL;
+    stage[4][0] = IMMUNE_WALL;
+    for (int i = 13; i < 21; i++)
+        stage[16][i] = WALL;
+    stage[16][20] = IMMUNE_WALL;
+    for (int i = 4; i < 17; i++)
+        stage[i][7] = WALL;
+    for (int i = 4; i < 17; i++)
+        stage[i][13] = WALL;
+    
 
     initscr();
     resize_term(23, 80);
