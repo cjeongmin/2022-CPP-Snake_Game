@@ -30,6 +30,7 @@ class Snake {
         return stage[y][x] == WALL || stage[y][x] == IMMUNE_WALL;
     };
     void show(int stage[21][21]);
+    void init();
 };
 
 #endif

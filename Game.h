@@ -15,6 +15,7 @@
 class Game {
    private:
     int stage[21][21];
+    int stageLevel;
     Cell items[2];
     Cell gates[2];
     int itemCount;
@@ -36,6 +37,13 @@ class Game {
     void generateGate();
     void run();
     void pause();  // for testing
+    void setStageLevel(int &itemTimerCount, int &poisonTimerCount);
+    void setStage0();
+    void setStage1();
+    void setStage2();
+    void setStage3();
+    void setStage4();
+    void initStage();
 };
 
 #endif

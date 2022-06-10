@@ -100,3 +100,12 @@ void Snake::show(int stage[21][21]) {
         cell.push_back(c);
     }
 }
+
+void Snake::init() {
+    cell.clear();
+    maximum_length = 3;
+    cell.push_back(Cell(10, 10, HEAD));
+    cell.push_back(Cell(10, 11, BODY));
+    cell.push_back(Cell(10, 12, BODY));
+    direction = 0;
+}

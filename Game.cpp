@@ -4,65 +4,10 @@
 
 Game::Game() {
     srand(time(NULL));
-    for (int i = 0; i < 21; i++) {
-        for (int j = 0; j < 21; j++) {
-            if (i == 0 || i == 20 || j == 0 || j == 20) {
-                stage[i][j] = WALL;
-            } else {
-                stage[i][j] = EMPTY;
-            }
-        }
-    }
-    stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
 
-    // stage 0
-    // for (int i = 5; i < 16; i++) {
-    //     for (int j = 5; j < 16; j++) {
-    //         if (i == 10 || j == 10) continue;
-    //         if (i == 5 || i == 15 || j == 5 || j == 15) {
-    //             stage[i][j] = WALL;
-    //         }
-    //     }
-    // }
+    stageLevel = 0;
 
-    // stage 1
-    // for (int i = 5; i < 16; i++) {
-    //     for (int j = 5; j < 16; j++) {
-    //         if (i == 5 || i == 15 || j == 5 || j == 15) {
-    //             stage[i][j] = WALL;
-    //         }
-    //     }
-    // }
-
-    // stage 2
-    // for (int i = 0; i < 21; i++) {
-    //     for (int j = 0; j < 21; j++) {
-    //         if (i == 10 || j == 10) {
-    //             stage[i][j] = WALL;
-    //         }
-    //     }
-    // }
-    
-    // stage 3
-    // for (int i = 0; i < 16; i++)
-    //     stage[6][i] = WALL;
-    // stage[6][0] = IMMUNE_WALL; 
-    // for (int i = 5; i < 21; i++)
-    //     stage[14][i] = WALL;
-    // stage[14][20] = IMMUNE_WALL;
-
-    // stage 4
-    for (int i = 1; i < 8; i++)
-        stage[4][i] = WALL;
-    stage[4][0] = IMMUNE_WALL;
-    for (int i = 13; i < 21; i++)
-        stage[16][i] = WALL;
-    stage[16][20] = IMMUNE_WALL;
-    for (int i = 4; i < 17; i++)
-        stage[i][7] = WALL;
-    for (int i = 4; i < 17; i++)
-        stage[i][13] = WALL;
-    
+    setStage0();
 
     initscr();
     resize_term(23, 80);
@@ -217,11 +162,13 @@ void Game::run() {
     drawGameBoard();
     drawScoreBoard();
     drawMissionBoard();
-    generateGate();
 
     int itemCount = 0;
     int poisonCount = 0;
+
     while (true) {
+        setStageLevel(itemCount, poisonCount);
+        
         int key = getch();
         if (key == 'q') {
             break;
@@ -266,11 +213,124 @@ void Game::run() {
 
         usleep(MICROSECOND_SECOND * 0.5);
     }
-
     nodelay(stdscr, false);
     getch();
 }
 
 void Game::pause() {
     getch();
+}
+
+void Game::setStageLevel(int &itemTimerCount, int &poisonTimerCount) {
+    if (elapsed > 6) {
+        stageLevel++;
+        elapsed = 0;
+        itemCount = 0;
+        poisonCount = 0;
+        gateCount = 0;
+        itemTimerCount = 0;
+        poisonTimerCount = 0;
+
+        switch (stageLevel) {
+        case 1:
+            setStage1();
+            break;
+        case 2:
+            // setStage2();
+            break;
+        case 3:
+            setStage3();
+            break;
+        case 4:
+            setStage4();
+        }
+    }
+}
+
+void Game::initStage() {
+    for (int i = 0; i < 21; i++) {
+        for (int j = 0; j < 21; j++) {
+            if (i == 0 || i == 20 || j == 0 || j == 20) {
+                stage[i][j] = WALL;
+            } else {
+                stage[i][j] = EMPTY;
+            }
+        }
+    }
+    stage[0][0] = stage[0][20] = stage[20][0] = stage[20][20] = IMMUNE_WALL;
+    
+    snake.init();
+}
+
+void Game::setStage0() {
+    initStage();
+    // stage 0
+    for (int i = 5; i < 16; i++) {
+        for (int j = 5; j < 16; j++) {
+            if (i == 10 || j == 10) continue;
+            if (i == 5 || i == 15 || j == 5 || j == 15) {
+                stage[i][j] = WALL;
+            }
+        }
+    }
+    generateGate();
+}
+
+void Game::setStage1() {
+    initStage();
+    //stage 1
+    for (int i = 5; i < 16; i++) {
+        for (int j = 5; j < 16; j++) {
+            if (i == 5 || i == 15 || j == 5 || j == 15) {
+                stage[i][j] = WALL;
+            }
+        }
+    }
+    generateGate();
+}
+
+void Game::setStage2() {
+    initStage();
+
+    // stage 2
+    for (int i = 0; i < 21; i++) {
+        for (int j = 0; j < 21; j++) {
+            if (i == 10 || j == 10) {
+                stage[i][j] = WALL;
+            }
+        }
+    }
+    generateGate();
+}
+
+void Game::setStage3() {
+    initStage();
+
+    // stage 3
+    for (int i = 0; i < 16; i++)
+        stage[6][i] = WALL;
+    stage[6][0] = IMMUNE_WALL; 
+    for (int i = 5; i < 21; i++)
+        stage[14][i] = WALL;
+    stage[14][20] = IMMUNE_WALL;
+
+    generateGate();
+}
+
+void Game::setStage4() {
+    initStage();
+
+    // stage 4
+    for (int i = 1; i < 8; i++)
+        stage[4][i] = WALL;
+    stage[4][0] = IMMUNE_WALL;
+    for (int i = 13; i < 21; i++)
+        stage[16][i] = WALL;
+    stage[16][20] = IMMUNE_WALL;
+    for (int i = 4; i < 17; i++)
+        stage[i][7] = WALL;
+    for (int i = 4; i < 17; i++)
+        stage[i][13] = WALL;
+
+    generateGate();
 }
