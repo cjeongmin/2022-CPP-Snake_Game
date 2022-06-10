@@ -317,10 +317,13 @@ void Game::setStage2() {
     for (int i = 12; i < 20; i++) {
         stage[i][i] = WALL;
     }
+    stage[0][1] = IMMUNE_WALL;
+    stage[1][0] = IMMUNE_WALL;
     for (int i = 1; i < 9; i++) {
         stage[i][i] = WALL;
     }
-    
+    stage[20][19] = IMMUNE_WALL;
+    stage[19][20] = IMMUNE_WALL;
 
     generateGate();
 }
