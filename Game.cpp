@@ -243,7 +243,7 @@ void Game::run() {
 }
 
 void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
-    if (elapsed > 60 * 2) {
+    if ( (elapsed > 60 * 2) && snake.size() > 10) {
         stageLevel++;
         elapsed = itemCount = poisonCount = gateCount = 0;
         itemTimer = poisonTimer = gateTimer = 0;
