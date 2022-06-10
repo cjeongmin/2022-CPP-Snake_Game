@@ -91,14 +91,11 @@ int Snake::move(int stage[21][21]) {
 void Snake::show(int stage[21][21]) {
     for (int y = 0; y < 21; y++)
         for (int x = 0; x < 21; x++)
-            if (stage[y][x] == HEAD || stage[y][x] == BODY) stage[y][x] = EMPTY;
+            if (stage[y][x] == HEAD || stage[y][x] == BODY)
+                stage[y][x] = EMPTY;
 
-    for (int length = cell.size(); length; length--) {
-        Cell c = cell.front();
-        cell.pop_front();
-        stage[c.r][c.c] = (c.type == HEAD ? HEAD : BODY);
-        cell.push_back(c);
-    }
+    for (auto it = cell.begin(); it != cell.end(); it++)
+        stage[it->r][it->c] = it->type;
 }
 
 void Snake::init() {

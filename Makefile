@@ -1,4 +1,4 @@
-CC = g++
+CC = g++ -std=c++17
 CCFLAGS = -g
 
 all: main.o Game.o Snake.o

@@ -293,6 +293,7 @@ void Game::setStage0() {
             }
         }
     }
+
     generateGate();
 }
 
