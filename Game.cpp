@@ -232,14 +232,30 @@ void Game::run() {
         elapsed++;
         gateTimer++;
 
+        drawWindowBorder(game, 23, 46);
+        drawWindowBorder(score, 11, 34);
+        drawWindowBorder(mission, 13, 34);
         drawGameBoard();
         drawScoreBoard();
         drawMissionBoard();
 
         usleep(MICROSECOND_SECOND * 0.5);
     }
-    nodelay(stdscr, false);
-    getch();
+    showResult("End.");
+}
+
+void Game::showResult(const char *result) {
+    wattron(stdscr, COLOR_PAIR(TEXT));
+    for (int r = 0; r < 23; r++) {
+        for (int c = 0; c < 80; c++) {
+            mvwaddch(stdscr, r, c, ' ');
+        }
+    }
+    mvwprintw(stdscr, 23 / 2, (80 - strlen(result)) / 2, "%s", result);
+    wattroff(stdscr, COLOR_PAIR(TEXT));
+
+    wrefresh(stdscr);
+    usleep(MICROSECOND_SECOND * 2);
 }
 
 void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
@@ -250,16 +266,23 @@ void Game::setStageLevel(int &itemTimer, int &poisonTimer, int &gateTimer) {
 
         switch (stageLevel) {
             case 1:
+                showResult("Next Stage.");
                 setStage1();
                 break;
             case 2:
+                showResult("Next Stage.");
                 setStage2();
                 break;
             case 3:
+                showResult("Next Stage.");
                 setStage3();
                 break;
             case 4:
+                showResult("Next Stage.");
                 setStage4();
+                break;
+            default:
+                showResult("End.");
         }
     }
 }
