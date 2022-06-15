@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include <cmath>
+#include <cstring>
 #include <iostream>
 
 Game::Game() {
